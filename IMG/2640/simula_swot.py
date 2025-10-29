@@ -222,7 +222,7 @@ def resposta_oponente(cenario: int) -> None:
 
         elif acao == "Render":
             oponente.Render()
-            print("Recalibragem Tática: Oponente se Rendeu, Força e Oportunidade Aumentam, Ameaça Diminui. (S:75, W:75, O:35, T:35)")
+            print("Recalibragem Tática: Oponente se Rendeu, Força e Oportunidade Aumentam, Ameaça Diminui.")
             Recalibrar(S=75, W=35, O=75, T=35)
         
     elif cenario == 2: # CENÁRIO WO: Min-Max (Oponente Cauteloso)
