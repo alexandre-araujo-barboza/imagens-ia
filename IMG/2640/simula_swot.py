@@ -168,7 +168,7 @@ def resposta_ambiente(cenario: int) -> None:
     Recebe o código do cenário (1=SO, 2=WO, 3=ST, 4=WT).
     Utiliza a variável global ambiente.
     """
-    global ambiente # CORRIGIDO: Referencia ambiente
+    global ambiente
     if ambiente is None:
         print("[ERRO] Instância Ambiente não inicializada.")
         return
@@ -178,16 +178,16 @@ def resposta_ambiente(cenario: int) -> None:
     # Simula o switch de 1 a 4 com if/elif
     if cenario == 1: # CENÁRIO SO: Max-Max (Ambiente Favorável)
         print(f"[Ambiente] Clima estável, Relevo {ambiente.Relevo} proporciona cobertura mínima.")
-        
+        Atualizar(5,0,5,0);
     elif cenario == 2: # CENÁRIO WO: Min-Max (Ambiente Favorável, mas exige cautela)
         print(f"[Ambiente] {ambiente.Temperatura}ºC e {ambiente.Vegetacao} densa facilitam o abrigo e ocultação.")
-        
+        Atualizar(5,0,-5,0);
     elif cenario == 3: # CENÁRIO ST: Max-Min (Ambiente Ameaçador)
         print(f"[Ambiente] Fauna {ambiente.Fauna} indica perigo biológico. Pressão de {ambiente.Pressao} hPa, dificuldade de locomoção.")
-
+        Atualizar(-5,0,5,0);
     elif cenario == 4: # CENÁRIO WT: Min-Min (Ambiente Hostil)
         print(f"[Ambiente] Relevo {ambiente.Relevo} e clima instável (vento, chuva) dificultam a evasão.")
-
+        Atualizar(-5,0,-5,0);
     else:
         print("[Ambiente] Sem resposta definida para o cenário.")
 
@@ -208,7 +208,7 @@ def resposta_oponente(cenario: int) -> None:
         print(f"[{oponente.nome}] Oponente encontra-se desorganizado (CENÁRIO SO).")
         acoes = ["Reagir", "Evadir", "Render"]
         acao = random.choice(acoes)
-        print(f"[{oponente.nome}] Ação randômica escolhida: {acao}")
+        print(f"[{oponente.nome}] Ação escolhida: {acao}")
         
         if acao == "Reagir":
             oponente.Reagir()
@@ -262,20 +262,18 @@ def Batalha() -> None:
     Ameaca = SWOT["Ameaca"]
 
     print(f"\nAvaliação: Forca={Forca}, Fraqueza={Fraqueza}, Oportunidade={Oportunidade}, Ameaca={Ameaca}")
-
-    # If Forca >= Fraqueza && Oportunidade >= Ameaca -> CENÁRIO SO
-    if Forca >= Fraqueza and Oportunidade >= Ameaca:
+    if Forca <= 0:
+        print("\nHumanoide está morto!")
+    elif Forca >= Fraqueza and Oportunidade >= Ameaca:
         print("\n[CENÁRIO SO] Tática: Eficiência (Max-Max) - Ações Humanoides:")
         m3.Render()
         m3.Prender()
         m8.Espalhar()
         m8.Avancar()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 1")
-        # Chamada das novas funções com o código do cenário
         resposta_oponente(1)
         resposta_ambiente(1)
 
-    # Else If Fraqueza > Forca && Oportunidade >= Ameaca -> CENÁRIO WO
     elif Fraqueza > Forca and Oportunidade >= Ameaca:
         print("\n[CENÁRIO WO] Tática: Manutenção (Min-Max) - Ações Humanoides:")
         m3.Proteger()
@@ -283,11 +281,8 @@ def Batalha() -> None:
         m8.Reagrupar()
         m8.Manter()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 2")
-        # Chamada das novas funções com o código do cenário
         resposta_oponente(2)
         resposta_ambiente(2)
-
-    # Else If Forca >= Fraqueza && Ameaca > Oportunidade -> CENÁRIO ST
     elif Forca >= Fraqueza and Ameaca > Oportunidade:
         print("\n[CENÁRIO ST] Tática: Resiliência (Max-Min) - Ações Humanoides:")
         m3.Prover()
@@ -295,11 +290,8 @@ def Batalha() -> None:
         m8.Reagrupar()
         m8.Manter()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 3")
-        # Chamada das novas funções com o código do cenário
         resposta_oponente(3)
         resposta_ambiente(3)
-
-    # Else If Fraqueza > Forca && Ameaca > Oportunidade -> CENÁRIO WT
     elif Fraqueza > Forca and Ameaca > Oportunidade:
         print("\n[CENÁRIO WT] Tática: Vulnerabilidade (Min-Min) - Ações Humanoides:")
         m3.Evadir()
@@ -307,18 +299,14 @@ def Batalha() -> None:
         m8.Evadir()
         m8.Retirar()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 4")
-        # Chamada das novas funções com o código do cenário
         resposta_oponente(4)
         resposta_ambiente(4)
-
     else:
         print("\nNenhuma condição combinada satisfeita. Nothing to do.")
-
 
 def Recalibrar(S: int, W: int, O: int, T: int) -> None:
     """
     Atualiza a matriz SWOT (global) e chama a função Batalha.
-    Não aceita m3 nem m8 como parâmetros, conforme solicitado.
     """
     print("\n--- Recalibrando Matriz SWOT ---")
     global SWOT
@@ -326,6 +314,20 @@ def Recalibrar(S: int, W: int, O: int, T: int) -> None:
     SWOT["Fraqueza"] = W
     SWOT["Oportunidade"] = O
     SWOT["Ameaca"] = T
+    print("Novos valores SWOT:", SWOT)
+    time.sleep(1)
+    Batalha()
+
+def Atualizar(S: int, W: int, O: int, T: int) -> None:
+    """
+    Atualiza a matriz SWOT (global) e chama a função Batalha.
+    """
+    print("\n--- Atualizando Matriz SWOT ---")
+    global SWOT
+    SWOT["Forca"] += S
+    SWOT["Fraqueza"] += W
+    SWOT["Oportunidade"] += O
+    SWOT["Ameaca"] += T
     print("Novos valores SWOT:", SWOT)
     time.sleep(1)
     Batalha()
@@ -352,6 +354,7 @@ def main() -> None:
     
     Batalha()
 
+    print(f"\nAvaliação: Forca={SWOT['Forca']}, Fraqueza={SWOT['Fraqueza']}, Oportunidade={SWOT['Oportunidade']}, Ameaca={SWOT['Ameaca']}")
     print("\nSimulação finalizada.")
 
 
