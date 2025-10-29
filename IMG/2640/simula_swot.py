@@ -159,6 +159,8 @@ m8: Optional[M8] = None
 ambiente: Optional[Ambiente] = None
 oponente: Optional[Oponente] = None
 
+# Contador global de batalhas
+contador_batalhas: int = 0
 
 # ---------- Funções de Resposta do Switch (Novas Funções) ---------------------------------------
 
@@ -316,17 +318,20 @@ def Batalha() -> None:
     if m3 is None or m8 is None:
         print("[ERRO FATAL] Agentes m3 e m8 não inicializados. Chame main() primeiro.")
         return
-    
+
+    global contador_batalhas
+    contador_batalhas += 1  # Incrementa a cada chamada
+
     Forca = SWOT["Forca"]
     Fraqueza = SWOT["Fraqueza"]
     Oportunidade = SWOT["Oportunidade"]
     Ameaca = SWOT["Ameaca"]
     print(f"\nAvaliação: Forca={Forca}, Fraqueza={Fraqueza}, Oportunidade={Oportunidade}, Ameaca={Ameaca}")
     if Forca <= 0:
-        print("\nVocê perdeu a Guerra!")
+        print(f"\nVocê perdeu a Guerra em {contador_batalhas} batalhas!")
         exit()
     elif Forca >= 100:
-        print("\nVocê ganhou a Guerra!")
+        print(f"\nVocê ganhou a Guerra em {contador_batalhas} batalhas!")
         exit()
     elif Forca >= Fraqueza and Oportunidade >= Ameaca:
         print("\n[CENÁRIO SO] Tática: Eficiência (Max-Max) - Ações Humanoides:")
@@ -403,6 +408,9 @@ def main() -> None:
     m8 = M8()
     ambiente = Ambiente(temperatura=22.0, pressao=0.98, relevo="montanhoso", vegetacao="densa", fauna="diversa")
     oponente = Oponente("insurgente")
+
+    global contador_batalhas
+    contador_batalhas = 0
 
     print("\nInstâncias criadas:")
     # Usando as variáveis globais para a exibição de estado
