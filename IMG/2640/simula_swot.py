@@ -65,7 +65,7 @@ class Oponente(Desafio):
         print("[Oponente] Evadir: oponente tenta evitar confronto.")
 
     def Render(self) -> None:
-        print("[Oponente] Render: renderizando ação/estado do oponente.")
+        print("[Oponente] Render: rendição do oponente.")
 
     def Avancar(self) -> None:
         print("[Oponente] Avancar: oponente avança (sem acento).")
