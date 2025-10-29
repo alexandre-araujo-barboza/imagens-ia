@@ -185,7 +185,7 @@ def resposta_ambiente() -> None:
         ambiente.Vegetacao = "escassa"
         ambiente.Fauna = "ausente"
         print(f"[Ambiente] Clima estável, Relevo {ambiente.Relevo} proporciona cobertura mínima.")
-        Atualizar(25,0,25,0);
+        Atualizar(25,-25,25,-25);
     elif opcao == "Cautela": # CENÁRIO WO: Min-Max (Ambiente Favorável, mas exige cautela)
         ambiente.Temperatura = 28.0
         ambiente.Pressao = 1.0
@@ -193,7 +193,7 @@ def resposta_ambiente() -> None:
         ambiente.Vegetacao = "densa"
         ambiente.Fauna = "ausente"
         print(f"[Ambiente] {ambiente.Temperatura}ºC e vegetação {ambiente.Vegetacao} facilitam o abrigo e ocultação.")
-        Atualizar(25,0,-25,0);
+        Atualizar(25,-25,-25,25);
     elif opcao == "Ameacador": # CENÁRIO ST: Max-Min (Ambiente Ameaçador)
         ambiente.Temperatura = 31.0
         ambiente.Pressao = 1.3
@@ -201,7 +201,7 @@ def resposta_ambiente() -> None:
         ambiente.Vegetacao = "escassa"
         ambiente.Fauna = "predadores"
         print(f"[Ambiente] Fauna {ambiente.Fauna} indica perigo biológico. Pressão de {ambiente.Pressao} hPa, dificuldade de locomoção.")
-        Atualizar(-25,0,25,0);
+        Atualizar(-25,25,25,-25);
     elif opcao == "Hostil": # CENÁRIO WT: Min-Min (Ambiente Hostil)
         ambiente.Temperatura = 15.0
         ambiente.Pressao = 1.2
@@ -209,7 +209,7 @@ def resposta_ambiente() -> None:
         ambiente.Vegetacao = "normal"
         ambiente.Fauna = "ausente"
         print(f"[Ambiente] Relevo {ambiente.Relevo} e clima instável (vento, chuva) dificultam a evasão.")
-        Atualizar(-25,0,-25,0);
+        Atualizar(-25,25,-25,25);
     else:
         print("opção inválida ou não definida.")
 
@@ -321,7 +321,8 @@ def Batalha() -> None:
 
     global contador_batalhas
     contador_batalhas += 1  # Incrementa a cada chamada
-
+    print("BATALHA: " + str(contador_batalhas))
+ 
     Forca = SWOT["Forca"]
     Fraqueza = SWOT["Fraqueza"]
     Oportunidade = SWOT["Oportunidade"]
