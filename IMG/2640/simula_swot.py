@@ -194,7 +194,6 @@ def resposta_ambiente() -> None:
 def resposta_oponente(cenario: int) -> None:
     """
     Simula a resposta do Oponente (Desafio) ao cenário tático,
-    incluindo uma resposta randômica e Recalibragem da SWOT para o Cenário 1 (SO).
     """
     global oponente # CORRIGIDO: Referencia oponente
     if oponente is None:
