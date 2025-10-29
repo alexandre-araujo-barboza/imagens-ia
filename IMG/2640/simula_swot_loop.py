@@ -1,4 +1,4 @@
-# simula_swot.py
+# simula_swot_loop.py
 # Python 3.12
 from __future__ import annotations
 from typing import Dict, Any, Optional
@@ -178,16 +178,16 @@ def resposta_ambiente() -> None:
     
     if opcao == "Favoravel": # CENÁRIO SO: Max-Max (Ambiente Favorável)
         print(f"[Ambiente] Clima estável, Relevo {ambiente.Relevo} proporciona cobertura mínima.")
-        Atualizar(15,0,15,0);
+        Atualizar(25,0,25,0);
     elif opcao == "Cautela": # CENÁRIO WO: Min-Max (Ambiente Favorável, mas exige cautela)
         print(f"[Ambiente] {ambiente.Temperatura}ºC e vegetação {ambiente.Vegetacao} facilitam o abrigo e ocultação.")
-        Atualizar(15,0,-15,0);
+        Atualizar(25,0,-25,0);
     elif opcao == "Ameacador": # CENÁRIO ST: Max-Min (Ambiente Ameaçador)
         print(f"[Ambiente] Fauna {ambiente.Fauna} indica perigo biológico. Pressão de {ambiente.Pressao} hPa, dificuldade de locomoção.")
-        Atualizar(-15,0,15,0);
+        Atualizar(-25,0,25,0);
     elif opcao == "Hostil": # CENÁRIO WT: Min-Min (Ambiente Hostil)
         print(f"[Ambiente] Relevo {ambiente.Relevo} e clima instável (vento, chuva) dificultam a evasão.")
-        Atualizar(-15,0,-15,0);
+        Atualizar(-25,0,-25,0);
     else:
         print("opção inválida ou não definida.")
 
@@ -210,7 +210,7 @@ def resposta_oponente(cenario: int) -> None:
         if acao == "Reagir":
             oponente.Reagir()
             print("Recalibragem Tática: Oponente Reagiu, Força e Oportunidade Diminuem, Ameaça Aumenta.")
-            Recalibrar(S=35, W=75, O=35, T=75) 
+            Recalibrar(S=25, W=75, O=25, T=75) 
         elif acao == "Evadir":
             oponente.Evadir()
             print("Recalibragem Tática: Oponente Evadiu, Retorno ao Ponto Neutro.")
@@ -218,7 +218,7 @@ def resposta_oponente(cenario: int) -> None:
         elif acao == "Render":
             oponente.Render()
             print("Recalibragem Tática: Oponente se Rendeu, Força e Oportunidade Aumentam, Ameaça Diminui.")
-            Recalibrar(S=75, W=35, O=75, T=35)
+            Recalibrar(S=75, W=25, O=75, T=25)
         
     elif cenario == 2: # CENÁRIO WO: Min-Max (Oponente Enfraquecido)
         print(f"[{oponente.nome}] Oponente encontra-se enfraquecido (CENÁRIO WO).")
@@ -228,7 +228,7 @@ def resposta_oponente(cenario: int) -> None:
         if acao == "Retirar":
             oponente.Retirar()
             print("Recalibragem Tática: Oponente Retirou-se, Força Aumenta, Oportunidade e Ameaça Diminuem.")
-            Recalibrar(S=75, W=75, O=35, T=35) 
+            Recalibrar(S=75, W=75, O=25, T=25) 
         elif acao == "Evadir":
             oponente.Evadir()
             print("Recalibragem Tática: Oponente Evitou o confronto, Retorno ao ponto neutro.")
@@ -236,7 +236,7 @@ def resposta_oponente(cenario: int) -> None:
         elif acao == "Avancar":
             oponente.Avancar()
             print("Recalibragem Tática: Oponente Avançou na linha de frente, Força e Oportunidade Diminuem, Ameaça Aumenta.")
-            Recalibrar(S=35, W=75, O=35, T=75) 
+            Recalibrar(S=25, W=75, O=25, T=75) 
         elif acao == "Espalhar":
             oponente.Espalhar()
             print("Recalibragem Tática: Oponente se dispersou, Retorno ao ponto neutro.")
@@ -249,7 +249,7 @@ def resposta_oponente(cenario: int) -> None:
         if acao == "Avancar":
             oponente.Avancar()
             print("Recalibragem Tática: Oponente Avançou na linha de frente, Força e Oportunidade Diminuem, Ameaça Aumenta.")
-            Recalibrar(S=35, W=75, O=35, T=75)
+            Recalibrar(S=25, W=75, O=25, T=75)
         elif acao == "Espalhar":
             oponente.Espalhar() 
             print("Recalibragem Tática: Oponente se dispersou, Retorno ao ponto neutro.")
@@ -257,11 +257,11 @@ def resposta_oponente(cenario: int) -> None:
         elif acao ==  "Abrigar":
             oponente.Abrigar() 
             print("Recalibragem Tática: Oponente Buscou Abrigo, Força e Oportunidade Aumentam, Ameaça Diminui.")
-            Recalibrar(S=75, W=35, O=75, T=35)
+            Recalibrar(S=75, W=25, O=75, T=25)
         elif acao == "Proteger":
             oponente.Proteger()
             print("Recalibragem Tática: Oponente está protegendo suas unidades, Retorno ao ponto neutro.")
-            Recalibrar(S=75, W=35, O=75, T=35)
+            Recalibrar(S=75, W=25, O=75, T=25)
     elif cenario == 4: # CENÁRIO WT: Min-Min (Oponente Predatório)
         print(f"[{oponente.nome}] Presença do oponente é um risco real (CENÁRIO WT).")
         acoes = ["Evadir", "Retirar", "Avancar", "Espalhar"]
@@ -270,7 +270,7 @@ def resposta_oponente(cenario: int) -> None:
         if acao == "Retirar":
             oponente.Retirar()
             print("Recalibragem Tática: Oponente Retirou-se, Força Aumenta, Oportunidade e Ameaça Diminuem.")
-            Recalibrar(S=75, W=75, O=35, T=35) 
+            Recalibrar(S=75, W=75, O=25, T=25) 
         elif acao == "Evadir":
             oponente.Evadir()
             print("Recalibragem Tática: Oponente Evitou o confronto, Retorno ao ponto neutro.")
@@ -278,7 +278,7 @@ def resposta_oponente(cenario: int) -> None:
         elif acao == "Avancar":
             oponente.Avancar()
             print("Recalibragem Tática: Oponente Avançou na linha de frente, Força e Oportunidade Diminuem, Ameaça Aumenta.")
-            Recalibrar(S=35, W=75, O=35, T=75)
+            Recalibrar(S=25, W=75, O=25, T=75)
         elif acao == "Espalhar":
             oponente.Espalhar() 
             print("Recalibragem Tática: Oponente se dispersou, Retorno ao ponto neutro.")
