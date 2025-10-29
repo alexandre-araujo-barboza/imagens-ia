@@ -1,7 +1,9 @@
 # simula_swot.py
 # Python 3.12
 from __future__ import annotations
-from typing import Dict
+from typing import Dict, Any, Optional
+import random
+import time
 
 # ---------- Classes base ---------------------------------------------------
 class Desafio:
@@ -27,7 +29,6 @@ class Ambiente(Desafio):
         fauna: str = "ausente",
     ) -> None:
         super().__init__()
-        # atributos públicos (python: por padrão são públicos)
         self.Temperatura: float = temperatura
         self.Pressao: float = pressao
         self.Relevo: str = relevo
@@ -45,7 +46,6 @@ class Oponente(Desafio):
     """
     Oponente extende Desafio e aceita apenas o nome como parâmetro.
     Funções exigidas: Reagir, Retirar, Evadir, Render, Avançar, Espalhar, Abrigar, Proteger
-    (incluí variantes sem acento quando houve ambiguidade para manter compatibilidade).
     """
     
     def __init__(self, nome: str = "Oponente") -> None:
@@ -56,28 +56,28 @@ class Oponente(Desafio):
         return f"Oponente(nome={self.nome})"
 
     def Reagir(self) -> None:
-        print("[Oponente] Reagir: comportamento reativo executado.")
+        print(f"[{self.nome}] Reagir: comportamento reativo executado.")
 
     def Retirar(self) -> None:
-        print("[Oponente] Retirar: oponente recua estrategicamente.")
+        print(f"[{self.nome}] Retirar: oponente recua estrategicamente.")
 
     def Evadir(self) -> None:
-        print("[Oponente] Evadir: oponente tenta evitar confronto.")
+        print(f"[{self.nome}] Evadir: oponente tenta evitar confronto.")
 
     def Render(self) -> None:
-        print("[Oponente] Render: rendição do oponente.")
+        print(f"[{self.nome}] Render: rendição do oponente.")
 
     def Avancar(self) -> None:
-        print("[Oponente] Avancar: oponente avança (sem acento).")
+        print(f"[{self.nome}] Avancar: oponente avança.")
 
     def Espalhar(self) -> None:
-        print("[Oponente] Espalhar: oponente dispersa suas unidades.")
+        print(f"[{self.nome}] Espalhar: oponente dispersa suas unidades.")
 
     def Abrigar(self) -> None:
-        print("[Oponente] Abrigar: oponente busca abrigo/tomar posição defensiva.")
+        print(f"[{self.nome}] Abrigar: oponente busca abrigo/tomar posição defensiva.")
 
     def Proteger(self) -> None:
-        print("[Oponente] Proteger: oponente protege unidade/posição.")
+        print(f"[{self.nome}] Proteger: oponente protege unidade/posição.")
 
 
 # ---------- Classe Humanoide e filhas -------------------------------------
@@ -91,8 +91,7 @@ class Humanoide:
 
 
 class M3(Humanoide):
-    """Herda Humanoide. Métodos pedidos: Render, Protejer, Prender, Abrigar.
-       Também implementei variantes e métodos adicionais usados nas transições (Prover, Auxiliar, Evadir, Retirar)."""
+    """Herda Humanoide. Métodos pedidos: Render, Proteger, Prender, Abrigar."""
     def __init__(self, nome: str = "M3") -> None:
         super().__init__(nome)
 
@@ -126,7 +125,7 @@ class M8(Humanoide):
         super().__init__(nome)
 
     def Espalhar(self) -> None:
-        print("[M8] Espalhar: M8 dispersa fogo/unidades.")
+        print("[M8] Espalhar: M8 dispersa unidades.")
 
     def Avancar(self) -> None:
         print("[M8] Avancar: M8 avança.")
@@ -144,9 +143,8 @@ class M8(Humanoide):
         print("[M8] Retirar: M8 recua/retira fogo.")
 
 
-# ---------- Estrutura SWOT -------------------------------------------------
-# "matriz de 4 dimensões chamada SWOT, cada dimensão da matriz é um par nome-valor"
-# Implementamos como um dicionário com as 4 chaves solicitadas.
+# ---------- Estruturas Globais (Estado Central) ----------------------------
+# Matriz SWOT é global para manter o estado da avaliação tática.
 SWOT: Dict[str, int] = {
     "Forca": 50,
     "Fraqueza": 50,
@@ -154,95 +152,208 @@ SWOT: Dict[str, int] = {
     "Ameaca": 50,
 }
 
+# Variáveis globais de instância m3 e m8 (agentes) e ambiente/oponente. 
+# Estas serão inicializadas em main() e acessadas em Batalha().
+m3: Optional[M3] = None
+m8: Optional[M8] = None
+ambiente: Optional[Ambiente] = None
+oponente: Optional[Oponente] = None
 
-# ---------- Funções de decisão (SO, WO, ST, WT) -----------------------------
-# Precisam existir com exatamente estes nomes e chamar os métodos conforme o DOC.
 
-# As funções recebem instâncias de M3 e M8 para operar sobre elas.
-def SO(m3: M3, m8: M8) -> None:
-    """Cenário SO: chama M3.Render(), M3.Prender() e M8.Espalhar(), M8.Avancar()."""
-    print("\n[SO] Cenário SO acionado (Eficiência).")
-    m3.Render()
-    m3.Prender()
-    m8.Espalhar()
-    m8.Avancar()
+# ---------- Funções de Resposta do Switch (Novas Funções) ---------------------------------------
 
-def WO(m3: M3, m8: M8) -> None:
-    """Cenário WO: chama M3.Proteger(), M3.Abrigar() e M8.Reagrupar(), M8.Manter()."""
-    print("\n[WO] Cenário WO acionado (Manutenção).")
-    m3.Proteger()
-    m3.Abrigar()
-    m8.Reagrupar()
-    m8.Manter()
+def resposta_ambiente(cenario: int) -> None:
+    """
+    Simula a resposta do Ambiente (Desafio) ao cenário tático.
+    Recebe o código do cenário (1=SO, 2=WO, 3=ST, 4=WT).
+    Utiliza a variável global ambiente.
+    """
+    global ambiente # CORRIGIDO: Referencia ambiente
+    if ambiente is None:
+        print("[ERRO] Instância Ambiente não inicializada.")
+        return
 
-def ST(m3: M3, m8: M8) -> None:
-    """Cenário ST: chama M3.Prover(), M3.Auxiliar() e M8.Reagrupar(), M8.Manter()."""
-    print("\n[ST] Cenário ST acionado (Resiliência sob ameaça).")
-    m3.Prover()
-    m3.Auxiliar()
-    m8.Reagrupar()
-    m8.Manter()
+    print("\n--- Resposta do Ambiente (Desafio Externo) ---")
+    
+    # Simula o switch de 1 a 4 com if/elif
+    if cenario == 1: # CENÁRIO SO: Max-Max (Ambiente Favorável)
+        print(f"[Ambiente] Clima estável, Relevo {ambiente.Relevo} proporciona cobertura mínima.")
+        
+    elif cenario == 2: # CENÁRIO WO: Min-Max (Ambiente Favorável, mas exige cautela)
+        print(f"[Ambiente] {ambiente.Temperatura}ºC e {ambiente.Vegetacao} densa facilitam o abrigo e ocultação.")
+        
+    elif cenario == 3: # CENÁRIO ST: Max-Min (Ambiente Ameaçador)
+        print(f"[Ambiente] Fauna {ambiente.Fauna} indica perigo biológico. Pressão de {ambiente.Pressao} hPa, dificuldade de locomoção.")
 
-def WT(m3: M3, m8: M8) -> None:
-    """Cenário WT: chama M3.Evadir(), M3.Retirar() e M8.Evadir(), M8.Retirar()."""
-    print("\n[WT] Cenário WT acionado (Vulnerabilidade).")
-    m3.Evadir()
-    m3.Retirar()
-    m8.Evadir()
-    m8.Retirar()
+    elif cenario == 4: # CENÁRIO WT: Min-Min (Ambiente Hostil)
+        print(f"[Ambiente] Relevo {ambiente.Relevo} e clima instável (vento, chuva) dificultam a evasão.")
+
+    else:
+        print("[Ambiente] Sem resposta definida para o cenário.")
+
+def resposta_oponente(cenario: int) -> None:
+    """
+    Simula a resposta do Oponente (Desafio) ao cenário tático,
+    incluindo uma resposta randômica e Recalibragem da SWOT para o Cenário 1 (SO).
+    """
+    global oponente # CORRIGIDO: Referencia oponente
+    if oponente is None:
+        print("[ERRO] Instância Oponente não inicializada.")
+        return
+
+    print("\n--- Resposta do Oponente (Desafio Externo) ---")
+
+    # Simula o switch de 1 a 4 com if/elif
+    if cenario == 1: # CENÁRIO SO: Max-Max -> Lógica Randômica
+        print(f"[{oponente.nome}] Oponente encontra-se desorganizado (CENÁRIO SO).")
+        acoes = ["Reagir", "Evadir", "Render"]
+        acao = random.choice(acoes)
+        print(f"[{oponente.nome}] Ação randômica escolhida: {acao}")
+        
+        if acao == "Reagir":
+            oponente.Reagir()
+            print("Recalibragem Tática: Oponente Reagiu, Força e Oportunidade Diminuem.")
+            Recalibrar(S=35, W=75, O=35, T=75) 
+            
+        elif acao == "Evadir":
+            oponente.Evadir()
+            print("Recalibragem Tática: Oponente Evadiu, Retorno ao Ponto Neutro.")
+            Recalibrar(S=50, W=50, O=50, T=50)
+
+        elif acao == "Render":
+            oponente.Render()
+            print("Recalibragem Tática: Oponente se Rendeu, Força e Oportunidade Aumentam, Ameaça Diminui. (S:75, W:75, O:35, T:35)")
+            Recalibrar(S=75, W=35, O=75, T=35)
+        
+    elif cenario == 2: # CENÁRIO WO: Min-Max (Oponente Cauteloso)
+        oponente.Abrigar()
+        oponente.Proteger()
+
+    elif cenario == 3: # CENÁRIO ST: Max-Min (Oponente Agressivo)
+        oponente.Reagir()
+        oponente.Avancar()
+
+    elif cenario == 4: # CENÁRIO WT: Min-Min (Oponente Predatório)
+        oponente.Espalhar()
+        oponente.Retirar()
+    
+    else:
+        print(f"[{oponente.nome}] Sem resposta definida para o cenário.")
+
+
+# ---------- Funções de Controle ---------------------------------------
+
+def Batalha() -> None:
+    """
+    Bloco principal de lógica de decisão. 
+    Acessa os agentes m3 e m8 globalmente, mas SEM recebê-los como parâmetro.
+    """
+    # Declara acesso às variáveis globais m3 e m8
+    global m3, m8
+
+    # Garante que os agentes globais foram inicializados
+    if m3 is None or m8 is None:
+        print("[ERRO FATAL] Agentes m3 e m8 não inicializados. Chame main() primeiro.")
+        return
+    
+    Forca = SWOT["Forca"]
+    Fraqueza = SWOT["Fraqueza"]
+    Oportunidade = SWOT["Oportunidade"]
+    Ameaca = SWOT["Ameaca"]
+
+    print(f"\nAvaliação: Forca={Forca}, Fraqueza={Fraqueza}, Oportunidade={Oportunidade}, Ameaca={Ameaca}")
+
+    # If Forca >= Fraqueza && Oportunidade >= Ameaca -> CENÁRIO SO
+    if Forca >= Fraqueza and Oportunidade >= Ameaca:
+        print("\n[CENÁRIO SO] Tática: Eficiência (Max-Max) - Ações Humanoides:")
+        m3.Render()
+        m3.Prender()
+        m8.Espalhar()
+        m8.Avancar()
+        print(f"[RESULTADO] Cenário Tático Acionado (Código): 1")
+        # Chamada das novas funções com o código do cenário
+        resposta_oponente(1)
+        resposta_ambiente(1)
+
+    # Else If Fraqueza > Forca && Oportunidade >= Ameaca -> CENÁRIO WO
+    elif Fraqueza > Forca and Oportunidade >= Ameaca:
+        print("\n[CENÁRIO WO] Tática: Manutenção (Min-Max) - Ações Humanoides:")
+        m3.Proteger()
+        m3.Abrigar()
+        m8.Reagrupar()
+        m8.Manter()
+        print(f"[RESULTADO] Cenário Tático Acionado (Código): 2")
+        # Chamada das novas funções com o código do cenário
+        resposta_oponente(2)
+        resposta_ambiente(2)
+
+    # Else If Forca >= Fraqueza && Ameaca > Oportunidade -> CENÁRIO ST
+    elif Forca >= Fraqueza and Ameaca > Oportunidade:
+        print("\n[CENÁRIO ST] Tática: Resiliência (Max-Min) - Ações Humanoides:")
+        m3.Prover()
+        m3.Auxiliar()
+        m8.Reagrupar()
+        m8.Manter()
+        print(f"[RESULTADO] Cenário Tático Acionado (Código): 3")
+        # Chamada das novas funções com o código do cenário
+        resposta_oponente(3)
+        resposta_ambiente(3)
+
+    # Else If Fraqueza > Forca && Ameaca > Oportunidade -> CENÁRIO WT
+    elif Fraqueza > Forca and Ameaca > Oportunidade:
+        print("\n[CENÁRIO WT] Tática: Vulnerabilidade (Min-Min) - Ações Humanoides:")
+        m3.Evadir()
+        m3.Retirar()
+        m8.Evadir()
+        m8.Retirar()
+        print(f"[RESULTADO] Cenário Tático Acionado (Código): 4")
+        # Chamada das novas funções com o código do cenário
+        resposta_oponente(4)
+        resposta_ambiente(4)
+
+    else:
+        print("\nNenhuma condição combinada satisfeita. Nothing to do.")
+
+
+def Recalibrar(S: int, W: int, O: int, T: int) -> None:
+    """
+    Atualiza a matriz SWOT (global) e chama a função Batalha.
+    Não aceita m3 nem m8 como parâmetros, conforme solicitado.
+    """
+    print("\n--- Recalibrando Matriz SWOT ---")
+    global SWOT
+    SWOT["Forca"] = S
+    SWOT["Fraqueza"] = W
+    SWOT["Oportunidade"] = O
+    SWOT["Ameaca"] = T
+    print("Novos valores SWOT:", SWOT)
+    time.sleep(1)
+    Batalha()
 
 # ---------- Função principal ------------------------------------------------
 def main() -> None:
     print("Iniciando simulação SWOT...\n")
     print("SWOT inicial:", SWOT)
 
-    # instâncias
+    # Instâncias persistentes criadas uma única vez no início da execução
+    # Acessa as variáveis globais para as instâncias
+    global m3, m8, ambiente, oponente
     m3 = M3()
     m8 = M8()
     ambiente = Ambiente(temperatura=22.0, pressao=0.98, relevo="montanhoso", vegetacao="densa", fauna="diversa")
     oponente = Oponente("insurgente")
 
     print("\nInstâncias criadas:")
+    # Usando as variáveis globais para a exibição de estado
     print(" -", m3.estado())
     print(" -", m8.estado())
     print(" -", repr(ambiente))
     print(" -", repr(oponente))
-
-    Forca = SWOT["Forca"]
-    Fraqueza = SWOT["Fraqueza"]
-    Oportunidade = SWOT["Oportunidade"]
-    Ameaca = SWOT["Ameaca"]
-
-    # Apresentando as variáveis para clareza
-    print(f"\nAvaliação: Forca={Forca}, Fraqueza={Fraqueza}, Oportunidade={Oportunidade}, Ameaca={Ameaca}")
-
-    # If Forca >= Fraqueza && Oportunidade >= Ameaca GOTO SO()
-    if Forca >= Fraqueza and Oportunidade >= Ameaca:
-        SO(m3, m8)
-
-    # Else If Fraqueza > Forca && Oportunidade >= Ameaca GOTO WO()
-    elif Fraqueza > Forca and Oportunidade >= Ameaca:
-        WO(m3, m8)
-
-    # Else If Forca >= Fraqueza && Ameaca > Oportunidade GOTO ST()
-    elif Forca >= Fraqueza and Ameaca > Oportunidade:
-        ST(m3, m8)
-
-    # Else If Fraqueza > Forca && Ameaca > Oportunidade GOTO WT()
-    elif Fraqueza > Forca and Ameaca > Oportunidade:
-        WT(m3, m8)
-
-    else:
-        # /* nothing todo */
-        print("\nNenhuma condição combinada satisfeita. Nothing to do.")
+    
+    Batalha()
 
     print("\nSimulação finalizada.")
 
 
 if __name__ == "__main__":
     main()
-
-
-### Como testar / executar
-### Salve o arquivo como: `simula_swot.py`
-### Execute no terminal: `python simula_swot.py` (certifique-se de usar Python 3.12).
