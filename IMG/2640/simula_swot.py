@@ -177,15 +177,35 @@ def resposta_ambiente() -> None:
     print("\n--- Resposta do Ambiente (Desafio Externo) ---")
     
     if opcao == "Favoravel": # CENÁRIO SO: Max-Max (Ambiente Favorável)
+        ambiente.Temperatura = 25.0
+        ambiente.Pressao = 1.0
+        ambiente.Relevo = "plano"
+        ambiente.Vegetacao = "escassa"
+        ambiente.Fauna = "ausente"
         print(f"[Ambiente] Clima estável, Relevo {ambiente.Relevo} proporciona cobertura mínima.")
         Atualizar(25,0,25,0);
     elif opcao == "Cautela": # CENÁRIO WO: Min-Max (Ambiente Favorável, mas exige cautela)
+        ambiente.Temperatura = 28.0
+        ambiente.Pressao = 1.0
+        ambiente.Relevo = "plano"
+        ambiente.Vegetacao = "densa"
+        ambiente.Fauna = "ausente"
         print(f"[Ambiente] {ambiente.Temperatura}ºC e vegetação {ambiente.Vegetacao} facilitam o abrigo e ocultação.")
         Atualizar(25,0,-25,0);
     elif opcao == "Ameacador": # CENÁRIO ST: Max-Min (Ambiente Ameaçador)
+        ambiente.Temperatura = 31.0
+        ambiente.Pressao = 1.3
+        ambiente.Relevo = "plano"
+        ambiente.Vegetacao = "escassa"
+        ambiente.Fauna = "predadores"
         print(f"[Ambiente] Fauna {ambiente.Fauna} indica perigo biológico. Pressão de {ambiente.Pressao} hPa, dificuldade de locomoção.")
         Atualizar(-25,0,25,0);
     elif opcao == "Hostil": # CENÁRIO WT: Min-Min (Ambiente Hostil)
+        ambiente.Temperatura = 15.0
+        ambiente.Pressao = 1.2
+        ambiente.Relevo = "montanhoso"
+        ambiente.Vegetacao = "normal"
+        ambiente.Fauna = "ausente"
         print(f"[Ambiente] Relevo {ambiente.Relevo} e clima instável (vento, chuva) dificultam a evasão.")
         Atualizar(-25,0,-25,0);
     else:
