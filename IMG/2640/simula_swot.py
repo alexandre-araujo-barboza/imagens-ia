@@ -162,34 +162,34 @@ oponente: Optional[Oponente] = None
 
 # ---------- Funções de Resposta do Switch (Novas Funções) ---------------------------------------
 
-def resposta_ambiente(cenario: int) -> None:
+def resposta_ambiente() -> None:
     """
     Simula a resposta do Ambiente (Desafio) ao cenário tático.
-    Recebe o código do cenário (1=SO, 2=WO, 3=ST, 4=WT).
-    Utiliza a variável global ambiente.
     """
     global ambiente
     if ambiente is None:
         print("[ERRO] Instância Ambiente não inicializada.")
         return
 
+    opcoes = ["Favoravel", "Cautela", "Ameacador", "Hostil"]
+    opcao = random.choice(opcoes)
+
     print("\n--- Resposta do Ambiente (Desafio Externo) ---")
     
-    # Simula o switch de 1 a 4 com if/elif
-    if cenario == 1: # CENÁRIO SO: Max-Max (Ambiente Favorável)
+    if opcao == "Favoravel": # CENÁRIO SO: Max-Max (Ambiente Favorável)
         print(f"[Ambiente] Clima estável, Relevo {ambiente.Relevo} proporciona cobertura mínima.")
         Atualizar(5,0,5,0);
-    elif cenario == 2: # CENÁRIO WO: Min-Max (Ambiente Favorável, mas exige cautela)
+    elif opcao == "Cautela": # CENÁRIO WO: Min-Max (Ambiente Favorável, mas exige cautela)
         print(f"[Ambiente] {ambiente.Temperatura}ºC e {ambiente.Vegetacao} densa facilitam o abrigo e ocultação.")
         Atualizar(5,0,-5,0);
-    elif cenario == 3: # CENÁRIO ST: Max-Min (Ambiente Ameaçador)
+    elif opcao == "Ameacador": # CENÁRIO ST: Max-Min (Ambiente Ameaçador)
         print(f"[Ambiente] Fauna {ambiente.Fauna} indica perigo biológico. Pressão de {ambiente.Pressao} hPa, dificuldade de locomoção.")
         Atualizar(-5,0,5,0);
-    elif cenario == 4: # CENÁRIO WT: Min-Min (Ambiente Hostil)
+    elif opcao == "Hostil": # CENÁRIO WT: Min-Min (Ambiente Hostil)
         print(f"[Ambiente] Relevo {ambiente.Relevo} e clima instável (vento, chuva) dificultam a evasão.")
         Atualizar(-5,0,-5,0);
     else:
-        print("[Ambiente] Sem resposta definida para o cenário.")
+        print("opção inválida ou não definida.")
 
 def resposta_oponente(cenario: int) -> None:
     """
@@ -246,7 +246,6 @@ def resposta_oponente(cenario: int) -> None:
 def Batalha() -> None:
     """
     Bloco principal de lógica de decisão. 
-    Acessa os agentes m3 e m8 globalmente, mas SEM recebê-los como parâmetro.
     """
     # Declara acesso às variáveis globais m3 e m8
     global m3, m8
@@ -272,8 +271,7 @@ def Batalha() -> None:
         m8.Avancar()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 1")
         resposta_oponente(1)
-        resposta_ambiente(1)
-
+        resposta_ambiente()
     elif Fraqueza > Forca and Oportunidade >= Ameaca:
         print("\n[CENÁRIO WO] Tática: Manutenção (Min-Max) - Ações Humanoides:")
         m3.Proteger()
@@ -282,7 +280,7 @@ def Batalha() -> None:
         m8.Manter()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 2")
         resposta_oponente(2)
-        resposta_ambiente(2)
+        resposta_ambiente()
     elif Forca >= Fraqueza and Ameaca > Oportunidade:
         print("\n[CENÁRIO ST] Tática: Resiliência (Max-Min) - Ações Humanoides:")
         m3.Prover()
@@ -291,7 +289,7 @@ def Batalha() -> None:
         m8.Manter()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 3")
         resposta_oponente(3)
-        resposta_ambiente(3)
+        resposta_ambiente()
     elif Fraqueza > Forca and Ameaca > Oportunidade:
         print("\n[CENÁRIO WT] Tática: Vulnerabilidade (Min-Min) - Ações Humanoides:")
         m3.Evadir()
@@ -300,7 +298,7 @@ def Batalha() -> None:
         m8.Retirar()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 4")
         resposta_oponente(4)
-        resposta_ambiente(4)
+        resposta_ambiente()
     else:
         print("\nNenhuma condição combinada satisfeita. Nothing to do.")
 
