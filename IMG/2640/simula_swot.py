@@ -180,7 +180,7 @@ def resposta_ambiente() -> None:
         print(f"[Ambiente] Clima estável, Relevo {ambiente.Relevo} proporciona cobertura mínima.")
         Atualizar(5,0,5,0);
     elif opcao == "Cautela": # CENÁRIO WO: Min-Max (Ambiente Favorável, mas exige cautela)
-        print(f"[Ambiente] {ambiente.Temperatura}ºC e {ambiente.Vegetacao} densa facilitam o abrigo e ocultação.")
+        print(f"[Ambiente] {ambiente.Temperatura}ºC e vegetação {ambiente.Vegetacao} facilitam o abrigo e ocultação.")
         Atualizar(5,0,-5,0);
     elif opcao == "Ameacador": # CENÁRIO ST: Max-Min (Ambiente Ameaçador)
         print(f"[Ambiente] Fauna {ambiente.Fauna} indica perigo biológico. Pressão de {ambiente.Pressao} hPa, dificuldade de locomoção.")
@@ -247,10 +247,7 @@ def Batalha() -> None:
     """
     Bloco principal de lógica de decisão. 
     """
-    # Declara acesso às variáveis globais m3 e m8
     global m3, m8
-
-    # Garante que os agentes globais foram inicializados
     if m3 is None or m8 is None:
         print("[ERRO FATAL] Agentes m3 e m8 não inicializados. Chame main() primeiro.")
         return
@@ -263,6 +260,7 @@ def Batalha() -> None:
     print(f"\nAvaliação: Forca={Forca}, Fraqueza={Fraqueza}, Oportunidade={Oportunidade}, Ameaca={Ameaca}")
     if Forca <= 0:
         print("\nHumanoide está morto!")
+        exit()
     elif Forca >= Fraqueza and Oportunidade >= Ameaca:
         print("\n[CENÁRIO SO] Tática: Eficiência (Max-Max) - Ações Humanoides:")
         m3.Render()
@@ -271,7 +269,6 @@ def Batalha() -> None:
         m8.Avancar()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 1")
         resposta_oponente(1)
-        resposta_ambiente()
     elif Fraqueza > Forca and Oportunidade >= Ameaca:
         print("\n[CENÁRIO WO] Tática: Manutenção (Min-Max) - Ações Humanoides:")
         m3.Proteger()
@@ -280,7 +277,6 @@ def Batalha() -> None:
         m8.Manter()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 2")
         resposta_oponente(2)
-        resposta_ambiente()
     elif Forca >= Fraqueza and Ameaca > Oportunidade:
         print("\n[CENÁRIO ST] Tática: Resiliência (Max-Min) - Ações Humanoides:")
         m3.Prover()
@@ -289,7 +285,6 @@ def Batalha() -> None:
         m8.Manter()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 3")
         resposta_oponente(3)
-        resposta_ambiente()
     elif Fraqueza > Forca and Ameaca > Oportunidade:
         print("\n[CENÁRIO WT] Tática: Vulnerabilidade (Min-Min) - Ações Humanoides:")
         m3.Evadir()
@@ -298,10 +293,10 @@ def Batalha() -> None:
         m8.Retirar()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 4")
         resposta_oponente(4)
-        resposta_ambiente()
     else:
-        print("\nNenhuma condição combinada satisfeita. Nothing to do.")
-
+        print("\nNenhuma condição satisfeita.")
+    resposta_ambiente()
+    
 def Recalibrar(S: int, W: int, O: int, T: int) -> None:
     """
     Atualiza a matriz SWOT (global) e chama a função Batalha.
@@ -327,8 +322,6 @@ def Atualizar(S: int, W: int, O: int, T: int) -> None:
     SWOT["Oportunidade"] += O
     SWOT["Ameaca"] += T
     print("Novos valores SWOT:", SWOT)
-    time.sleep(1)
-    Batalha()
 
 # ---------- Função principal ------------------------------------------------
 def main() -> None:
