@@ -24,23 +24,23 @@ class Ambiente(Desafio):
     """
     def __init__(
         self,
-        temperatura: float = 25.0,
-        pressao: float = 1.0,
+        temperatura: float = 30.0,
+        pressao: float = 1013,
         relevo: str = "plano",
         vegetacao: str = "escassa",
-        fauna: str = "ausente",
+        clima: str = "estavel",
     ) -> None:
         super().__init__()
         self.Temperatura: float = temperatura
         self.Pressao: float = pressao
         self.Relevo: str = relevo
         self.Vegetacao: str = vegetacao
-        self.Fauna: str = fauna
+        self.Clima: str = clima
 
     def __repr__(self) -> str:
         return (
             f"Ambiente(Temperatura={self.Temperatura}, Pressao={self.Pressao}, "
-            f"Relevo={self.Relevo}, Vegetacao={self.Vegetacao}, Fauna={self.Fauna})"
+            f"Relevo={self.Relevo}, Vegetacao={self.Vegetacao}, Clima={self.Clima})"
         )
 
 
@@ -182,34 +182,34 @@ def resposta_ambiente() -> None:
     
     if opcao == "Favoravel": # CENÁRIO SO: Max-Max (Ambiente Favorável)
         ambiente.Temperatura = 25.0
-        ambiente.Pressao = 1.0
+        ambiente.Pressao = 1013
         ambiente.Relevo = "plano"
         ambiente.Vegetacao = "escassa"
-        ambiente.Fauna = "ausente"
+        ambiente.Clima = "estavel"
         print(f"[Ambiente] Clima estável, Relevo {ambiente.Relevo} proporciona cobertura mínima.")
         Atualizar(25,-25,25,-25);
     elif opcao == "Cautela": # CENÁRIO WO: Min-Max (Ambiente Favorável, mas exige cautela)
         ambiente.Temperatura = 28.0
-        ambiente.Pressao = 1.0
+        ambiente.Pressao = 1013
         ambiente.Relevo = "plano"
         ambiente.Vegetacao = "densa"
-        ambiente.Fauna = "ausente"
-        print(f"[Ambiente] {ambiente.Temperatura}ºC e vegetação {ambiente.Vegetacao} facilitam o abrigo e ocultação.")
+        ambiente.Clima = "estavel"
+        print(f"[Ambiente] Temperatura {ambiente.Temperatura}ºC e vegetação {ambiente.Vegetacao} facilitam o abrigo e ocultação.")
         Atualizar(25,-25,-25,25);
     elif opcao == "Ameacador": # CENÁRIO ST: Max-Min (Ambiente Ameaçador)
         ambiente.Temperatura = 31.0
-        ambiente.Pressao = 1.3
+        ambiente.Pressao = 1026
         ambiente.Relevo = "plano"
         ambiente.Vegetacao = "escassa"
-        ambiente.Fauna = "predadores"
-        print(f"[Ambiente] Fauna {ambiente.Fauna} indica perigo biológico. Pressão de {ambiente.Pressao} hPa, dificuldade de locomoção.")
+        ambiente.Clima = "instavel"
+        print(f"[Ambiente] Clima {ambiente.Clima} indica pouca visibilidade. Pressão de {ambiente.Pressao} hPa, dificuldade de locomoção.")
         Atualizar(-25,25,25,-25);
     elif opcao == "Hostil": # CENÁRIO WT: Min-Min (Ambiente Hostil)
-        ambiente.Temperatura = 15.0
-        ambiente.Pressao = 1.2
+        ambiente.Temperatura = 9.0
+        ambiente.Pressao = 1024
         ambiente.Relevo = "montanhoso"
         ambiente.Vegetacao = "normal"
-        ambiente.Fauna = "ausente"
+        ambiente.Clima = "instavel"
         print(f"[Ambiente] Relevo {ambiente.Relevo} e clima instável (vento, chuva) dificultam a evasão.")
         Atualizar(-25,25,-25,25);
     else:
@@ -416,7 +416,7 @@ def main() -> None:
     global m3, m8, ambiente, oponente
     m3 = M3()
     m8 = M8()
-    ambiente = Ambiente(temperatura=22.0, pressao=0.98, relevo="montanhoso", vegetacao="densa", fauna="diversa")
+    ambiente = Ambiente(temperatura=22.0, pressao=1013, relevo="montanhoso", vegetacao="densa", clima="estavel")
     oponente = Oponente("insurgente")
 
     global contador_batalhas
