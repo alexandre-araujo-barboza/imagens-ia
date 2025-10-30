@@ -46,7 +46,7 @@ def _draw_static(canvas):
         y += dash_len + dash_gap
 
     # título e rótulos
-    canvas.create_text(cx, 30, text="Matriz SWOT", fill="white", font=TITLE_FONT)
+    canvas.create_text(cx, 30, text="SWOT", fill="white", font=TITLE_FONT)
     margin_x = 40
     canvas.create_text(margin_x, cy / 2, text="Força", fill=AXIS_COLOR, font=LABEL_FONT, anchor="w")
     canvas.create_text(WIDTH - margin_x, cy / 2, text="Oportunidade", fill=AXIS_COLOR, font=LABEL_FONT, anchor="e")
@@ -56,7 +56,7 @@ def _draw_static(canvas):
 def iniciar_interface():
     """Cria a janela e roda o mainloop (deve ser chamada no thread principal)."""
     root = tk.Tk()
-    root.title("Matriz SWOT (Simulação)")
+    root.title("Matriz SWOT (Gráfico)")
     root.geometry(f"{WIDTH}x{HEIGHT}")
     root.resizable(False, False)
     canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT, bg="black")
@@ -90,15 +90,16 @@ def iniciar_interface():
             ts = _app["target_s"]
             to = _app["target_o"]
 
-            # aproxima gradualmente
-            if cs < ts: cs += ANIMATION_SPEED
-            elif cs > ts: cs -= ANIMATION_SPEED
-            if co < to: co += ANIMATION_SPEED
-            elif co > to: co -= ANIMATION_SPEED
+            # movimento gradual com interpolação (sem saltos)
+            lerp_factor = 0.1  # 0.1 = movimento suave, sem vibração
+            cs = cs + (ts - cs) * lerp_factor
+            co = co + (to - co) * lerp_factor
 
-            # limita ao intervalo [0, 100]
-            cs = max(0, min(100, cs))
-            co = max(0, min(100, co))
+            # trava movimento se diferença for pequena
+            if abs(ts - cs) < 0.3:
+                cs = ts
+            if abs(to - co) < 0.3:
+                co = to
 
             _app["current_s"], _app["current_o"] = cs, co
 

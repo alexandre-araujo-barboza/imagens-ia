@@ -335,10 +335,10 @@ def Batalha() -> None:
     # Parâmetros: S = Forca, W = Fraqueza, O = Oportunidade, T = Ameaça
     iniciar_grafico_swot(Forca, Fraqueza, Oportunidade, Ameaca)
 
-    if Forca <= 0:
+    if Forca <= 0 and Ameaca >= 100:
         print(f"\nVocê perdeu a Guerra em {contador_batalhas} batalhas!")
         exit()
-    elif Forca >= 100:
+    elif Forca >= 100 and Ameaca <= 0:
         print(f"\nVocê ganhou a Guerra em {contador_batalhas} batalhas!")
         exit()
     elif Forca >= Fraqueza and Oportunidade >= Ameaca:
