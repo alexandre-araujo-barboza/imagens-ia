@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # graph_swot.py
 # Python 3.12
-# Janela 640x640. Apenas UMA linha horizontal vermelha para S/W e UMA vertical para O/T.
-# Um par (S/W ou O/T) muda por vez. Transição suave entre valores múltiplos de 25.
+# Janela 640x640. Eixos pontilhados desenhados manualmente (segmentos).
+# Linhas móveis sólidas verdes (não há linhas vermelhas).
 
 import tkinter as tk
 import random
@@ -13,26 +13,27 @@ WIDTH = 640
 HEIGHT = 640
 
 GRID_STEP = 32
-AXIS_COLOR = "#00FF00"
+AXIS_COLOR = "#00FF00"   # verde para eixos
 GRID_COLOR = "#004400"
-LINE_COLOR = "#FF0000"
+LINE_COLOR = AXIS_COLOR  # linhas móveis também em verde sólido
 TITLE_FONT = ("Helvetica", 28, "bold")
 LABEL_FONT = ("Helvetica", 14, "normal")
 
-# Valores atuais (0..100). S/W são complementares, O/T também.
+# Valores iniciais (0..100)
 S = 50
 O = 50
-# W = 100 - S
-# T = 100 - O
 
 # Animação
 STEP_MS = 25           # ms entre frames de animação
 TRANSITION_STEPS = 20  # quantos frames a transição levará
 UPDATE_INTERVAL = 800  # ms entre escolhas de novo movimento
 
+# Parâmetros do pontilhado manual dos eixos (ajuste aqui)
+DASH_LEN = 5   # comprimento do traço em pixels
+DASH_GAP = 10    # espaço entre traços em pixels
+
 def value_to_y(v: int) -> int:
     """Converte valor 0..100 para coordenada Y (0 topo, HEIGHT base)"""
-    # NOTE: v=0 -> topo (0), v=100 -> base (HEIGHT)
     return int((v / 100) * HEIGHT)
 
 def value_to_x(v: int) -> int:
@@ -53,34 +54,53 @@ class SWOTApp:
         self.s = S
         self.o = O
 
-        # elementos desenhados (vamos atualizar coords)
-        self._draw_static()  # eixos, título, etc.
-        self.hline = self.canvas.create_line(0, value_to_y(self.s), WIDTH, value_to_y(self.s), fill=LINE_COLOR, width=3)
-        self.vline = self.canvas.create_line(value_to_x(self.o), 0, value_to_x(self.o), HEIGHT, fill=LINE_COLOR, width=3)
+        # desenha estático
+        self._draw_static()
 
-        # labels para mostrar valores atuais (opcional, na tela)
+        # cria linhas móveis únicas
+        y_init = value_to_y(self.s)
+        x_init = value_to_x(self.o)
+        self.hline = self.canvas.create_line(0, y_init, WIDTH, y_init, fill=LINE_COLOR, width=3)
+        self.vline = self.canvas.create_line(x_init, 0, x_init, HEIGHT, fill=LINE_COLOR, width=3)
+
+        # labels para mostrar valores atuais (pequenos, informativos)
         self.label_s = self.canvas.create_text(10, 10, anchor="nw", text=f"S={self.s}  W={100-self.s}", fill="white", font=("Helvetica", 12))
         self.label_o = self.canvas.create_text(10, 30, anchor="nw", text=f"O={self.o}  T={100-self.o}", fill="white", font=("Helvetica", 12))
 
-        # Iniciar ciclo de atualizações (agenda primeira escolha após um curto delay)
+        # agenda a primeira escolha
         self.master.after(400, self.schedule_next_move)
-
-        # Permite fechar com ESC também
         self.master.bind("<Escape>", lambda e: self.master.destroy())
 
     def _draw_static(self):
-        """Desenha eixos, grade, título e rótulos fixas."""
+        """Desenha grade, eixos (pontilhado manual), título e rótulos centralizados verticalmente."""
         # grade
         for x in range(0, WIDTH, GRID_STEP):
             self.canvas.create_line(x, 0, x, HEIGHT, fill=GRID_COLOR)
         for y in range(0, HEIGHT, GRID_STEP):
             self.canvas.create_line(0, y, WIDTH, y, fill=GRID_COLOR)
 
-        # eixos principais (centro)
+        # centro
         cx = WIDTH // 2
         cy = HEIGHT // 2
-        self.canvas.create_line(0, cy, WIDTH, cy, fill=AXIS_COLOR, width=2)
-        self.canvas.create_line(cx, 0, cx, HEIGHT, fill=AXIS_COLOR, width=2)
+
+        # --- Eixos pontilhados desenhados manualmente (horizontal e vertical) ---
+        # Eixo horizontal (X visualizado como a linha central Y)
+        x = 0
+        while x < WIDTH:
+            x_end = x + DASH_LEN
+            if x_end > WIDTH:
+                x_end = WIDTH
+            self.canvas.create_line(x, cy, x_end, cy, fill=AXIS_COLOR, width=2)
+            x += DASH_LEN + DASH_GAP
+
+        # Eixo vertical (Y visualizado como a linha central X)
+        y = 0
+        while y < HEIGHT:
+            y_end = y + DASH_LEN
+            if y_end > HEIGHT:
+                y_end = HEIGHT
+            self.canvas.create_line(cx, y, cx, y_end, fill=AXIS_COLOR, width=2)
+            y += DASH_LEN + DASH_GAP
 
         # título
         self.canvas.create_text(WIDTH // 2, int(HEIGHT * 0.05),
@@ -90,6 +110,7 @@ class SWOTApp:
         margin_x = 40
 
         # rótulos centralizados verticalmente nos quadrantes
+        # metade superior centro-vertical: cy / 2; metade inferior: cy + cy/2
         self.canvas.create_text(margin_x, cy / 2,
                                 text="Força", fill=AXIS_COLOR,
                                 font=LABEL_FONT, anchor="w")
@@ -115,7 +136,6 @@ class SWOTApp:
         choices = [0, 25, 50, 75, 100]
         if move_type == "horizontal":
             cur = self.s
-            # garantimos uma escolha diferente para ver movimento (se possível)
             possible = [v for v in choices if v != cur]
             new_val = random.choice(possible) if possible else cur
             self.animate_horizontal(cur, new_val)
@@ -125,12 +145,11 @@ class SWOTApp:
             new_val = random.choice(possible) if possible else cur
             self.animate_vertical(cur, new_val)
 
-        # agenda a próxima escolha depois do intervalo (após uma margem)
+        # agenda a próxima escolha depois do intervalo
         self.master.after(UPDATE_INTERVAL, self.schedule_next_move)
 
     def animate_horizontal(self, start_val, end_val):
         """Transição suave da linha horizontal S (W é complementar)."""
-        # calcula passos
         delta = (end_val - start_val) / TRANSITION_STEPS
         step = 0
 
@@ -139,22 +158,17 @@ class SWOTApp:
             if step < TRANSITION_STEPS:
                 step += 1
                 current = start_val + delta * step
+                # arredonda para inteiro para coordenada pixel
                 self.s = int(round(current))
-                # atualiza linha (convertendo para pixel Y)
                 y = value_to_y(self.s)
                 self.canvas.coords(self.hline, 0, y, WIDTH, y)
-                # atualiza label textual na tela
                 self.canvas.itemconfigure(self.label_s, text=f"S={self.s:3d}  W={100-self.s:3d}")
-                # força redraw
-                # schedule next frame
                 self.master.after(STEP_MS, step_func)
             else:
-                # garantir valor final exato inteiro multiplo de 25
                 self.s = int(end_val)
                 y = value_to_y(self.s)
                 self.canvas.coords(self.hline, 0, y, WIDTH, y)
                 self.canvas.itemconfigure(self.label_s, text=f"S={self.s:3d}  W={100-self.s:3d}")
-                # print no console para debug
                 print(f"[H] S={self.s} W={100-self.s}")
         step_func()
 
@@ -187,7 +201,6 @@ def main():
     try:
         root.mainloop()
     except KeyboardInterrupt:
-        # Em alguns consoles isso será chamado; em outros, feche a janela
         print("Programa interrompido (KeyboardInterrupt).")
         try:
             root.destroy()
