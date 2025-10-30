@@ -2,6 +2,8 @@
 # Python 3.12
 from __future__ import annotations
 from typing import Dict, Any, Optional
+from graph_swot import iniciar_grafico_swot, iniciar_interface
+import threading
 import random
 import time
 
@@ -328,6 +330,11 @@ def Batalha() -> None:
     Oportunidade = SWOT["Oportunidade"]
     Ameaca = SWOT["Ameaca"]
     print(f"\nAvaliação: Forca={Forca}, Fraqueza={Fraqueza}, Oportunidade={Oportunidade}, Ameaca={Ameaca}")
+
+    # Adicionar aqui a chamada da threat no arquivo graph_swot.py
+    # Parâmetros: S = Forca, W = Fraqueza, O = Oportunidade, T = Ameaça
+    iniciar_grafico_swot(Forca, Fraqueza, Oportunidade, Ameaca)
+
     if Forca <= 0:
         print(f"\nVocê perdeu a Guerra em {contador_batalhas} batalhas!")
         exit()
@@ -399,6 +406,8 @@ def Atualizar(S: int, W: int, O: int, T: int) -> None:
 
 # ---------- Função principal ------------------------------------------------
 def main() -> None:
+    threading.Thread(target=iniciar_interface, daemon=True).start()
+
     print("Iniciando simulação SWOT...\n")
     print("SWOT inicial:", SWOT)
 
