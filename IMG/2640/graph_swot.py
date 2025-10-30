@@ -23,8 +23,11 @@ _app = {"root": None, "canvas": None, "hline": None, "vline": None,
 ANIMATION_SPEED = 4      # quanto maior, mais rápido
 REFRESH_MS = 25          # tempo entre frames (ms)
 
-def value_to_y(v): return int((v / 100) * HEIGHT)
-def value_to_x(v): return int((v / 100) * WIDTH)
+# CORREÇÃO EIXO Y (S): Mapeamento DIRETO. S=100 -> y=HEIGHT. Maximiza o quadrante SUPERIOR (S).
+def value_to_y(v): return int((v / 100) * HEIGHT) 
+
+# CORREÇÃO EIXO X (O): Mapeamento INVERTIDO. O=100 -> x=0. Maximiza a área DIREITA (O/T).
+def value_to_x(v): return int(WIDTH - (v / 100) * WIDTH)
 
 def _draw_static(canvas):
     cx, cy = WIDTH // 2, HEIGHT // 2
@@ -63,10 +66,13 @@ def iniciar_interface():
     canvas.pack(fill="both", expand=True)
 
     _draw_static(canvas)
-    cy, cx = HEIGHT // 2, WIDTH // 2
-
-    hline = canvas.create_line(0, cy, WIDTH, cy, fill=LINE_COLOR, width=3)
-    vline = canvas.create_line(cx, 0, cx, HEIGHT, fill=LINE_COLOR, width=3)
+    
+    # Valores iniciais (50) mapeados pelas novas funções
+    hline_y = value_to_y(50)
+    vline_x = value_to_x(50)
+    
+    hline = canvas.create_line(0, hline_y, WIDTH, hline_y, fill=LINE_COLOR, width=3)
+    vline = canvas.create_line(vline_x, 0, vline_x, HEIGHT, fill=LINE_COLOR, width=3)
     label_s = canvas.create_text(10, 10, anchor="nw", text="S=50 W=50", fill="white", font=("Helvetica", 12))
     label_o = canvas.create_text(10, 30, anchor="nw", text="O=50 T=50", fill="white", font=("Helvetica", 12))
 
