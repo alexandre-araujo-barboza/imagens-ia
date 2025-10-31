@@ -323,7 +323,7 @@ def Batalha() -> None:
 
     global contador_batalhas
     contador_batalhas += 1  # Incrementa a cada chamada
-    print("BATALHA: " + str(contador_batalhas))
+    print("\nBATALHA: " + str(contador_batalhas))
  
     Forca = SWOT["Forca"]
     Fraqueza = SWOT["Fraqueza"]
@@ -335,10 +335,10 @@ def Batalha() -> None:
     # Parâmetros: S = Forca, W = Fraqueza, O = Oportunidade, T = Ameaça
     iniciar_grafico_swot(Forca, Fraqueza, Oportunidade, Ameaca)
 
-    if Forca <= 0 and Ameaca >= 100:
+    if Forca <= 0 and Ameaca >= 100 and Oportunidade <= 0 and Fraqueza >= 100:
         print(f"\nVocê perdeu a Guerra em {contador_batalhas} batalhas!")
         exit()
-    elif Forca >= 100 and Ameaca <= 0:
+    elif Forca >= 100 and Ameaca <= 0 and Oportunidade >= 100 and Fraqueza <= 0:
         print(f"\nVocê ganhou a Guerra em {contador_batalhas} batalhas!")
         exit()
     elif Forca >= Fraqueza and Oportunidade >= Ameaca:
