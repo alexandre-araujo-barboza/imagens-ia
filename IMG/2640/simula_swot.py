@@ -191,7 +191,7 @@ def resposta_ambiente() -> None:
         ambiente.Relevo = "plano"
         ambiente.Vegetacao = "escassa"
         ambiente.Clima = "estavel"
-        print(f"[Ambiente] Clima estável, Relevo {ambiente.Relevo} proporciona cobertura mínima.")
+        print(f"[Ambiente] Clima {ambiente.Clima}, Relevo {ambiente.Relevo} proporciona cobertura mínima.")
         Atualizar(25,-25,25,-25);
     elif opcao == "Cautela": # CENÁRIO WO: Min-Max (Ambiente Favorável, mas exige cautela)
         ambiente.Temperatura = 28.0
