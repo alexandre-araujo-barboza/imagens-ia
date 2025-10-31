@@ -23,7 +23,7 @@ class Desafio:
 class Ambiente(Desafio):
     """
     Ambiente extende Desafio.
-    Variáveis públicas: Temperatura, Pressao, Relevo, Vegetacao, Fauna
+    Variáveis públicas: Temperatura, Pressao, Relevo, Vegetacao, Clima
     """
     def __init__(
         self,
