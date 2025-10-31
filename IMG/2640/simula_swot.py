@@ -99,6 +99,7 @@ class M3(Humanoide):
     """Herda Humanoide. Métodos pedidos: Render, Proteger, Prender, Abrigar."""
     def __init__(self, nome: str = "M3") -> None:
         super().__init__(nome)
+        self.Torque: str = "livre"
 
     def Render(self) -> None:
         print("[M3] Render: M3 paralisa o alvo.")
@@ -128,7 +129,8 @@ class M8(Humanoide):
     """Herda Humanoide. Métodos pedidos: Espalhar, Avançar, Reagrupar, Manter, Evadir, Retirar."""
     def __init__(self, nome: str = "M8") -> None:
         super().__init__(nome)
-
+        self.Fogo: str = "livre"
+ 
     def Espalhar(self) -> None:
         print("[M8] Espalhar: M8 dispersa unidades.")
 
@@ -346,40 +348,55 @@ def Batalha() -> None:
         exit()
     elif Forca >= Fraqueza and Oportunidade >= Ameaca:
         print("\n[CENÁRIO SO] Tática: Eficiência (Max-Max) - Ações Humanoides:")
+        m3.Torque = "restrito"
+        m8.Fogo = "livre"
         m3.Render()
         m3.Prender()
         m8.Espalhar()
         m8.Avancar()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 1")
+        print(f" - M3 Torque: {m3.Torque}")
+        print(f" - M8 Fogo: {m8.Fogo}")
         resposta_oponente(1)
     elif Fraqueza > Forca and Oportunidade >= Ameaca:
         print("\n[CENÁRIO WO] Tática: Manutenção (Min-Max) - Ações Humanoides:")
+        m3.Torque = "reduzido"
+        m8.Fogo = "reduzido"
         m3.Proteger()
         m3.Abrigar()
         m8.Reagrupar()
         m8.Manter()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 2")
+        print(f" - M3 Torque: {m3.Torque}")
+        print(f" - M8 Fogo: {m8.Fogo}")
         resposta_oponente(2)
     elif Forca >= Fraqueza and Ameaca > Oportunidade:
         print("\n[CENÁRIO ST] Tática: Resiliência (Max-Min) - Ações Humanoides:")
+        m3.Torque = "livre"
+        m8.Fogo = "livre"
         m3.Prover()
         m3.Auxiliar()
         m8.Reagrupar()
         m8.Manter()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 3")
+        print(f" - M3 Torque: {m3.Torque}")
+        print(f" - M8 Fogo: {m8.Fogo}")
         resposta_oponente(3)
     elif Fraqueza > Forca and Ameaca > Oportunidade:
         print("\n[CENÁRIO WT] Tática: Vulnerabilidade (Min-Min) - Ações Humanoides:")
+        m3.Torque = "livre"
+        m8.Fogo = "restrito"
         m3.Evadir()
         m3.Retirar()
         m8.Evadir()
         m8.Retirar()
         print(f"[RESULTADO] Cenário Tático Acionado (Código): 4")
+        print(f" - M3 Torque: {m3.Torque}")
+        print(f" - M8 Fogo: {m8.Fogo}")
         resposta_oponente(4)
     else:
         print("\nNenhuma condição satisfeita.")
-    
-    
+        
 def Recalibrar(S: int, W: int, O: int, T: int) -> None:
     """
     Atualiza a matriz SWOT (global) e chama a função Batalha.
@@ -393,6 +410,8 @@ def Recalibrar(S: int, W: int, O: int, T: int) -> None:
     print("Novos valores SWOT:", SWOT)
     resposta_ambiente()
     time.sleep(1)
+    # Se quiser passo a passo descomente a linha abaixo e comente o sleep
+    # input("Pressione ENTER para iniciar a próxima Batalha...")
     Batalha()
 
 def Atualizar(S: int, W: int, O: int, T: int) -> None:
@@ -428,7 +447,9 @@ def main() -> None:
     print("\nInstâncias criadas:")
     # Usando as variáveis globais para a exibição de estado
     print(" -", m3.estado())
+    print(f" - M3 Torque: {m3.Torque}")
     print(" -", m8.estado())
+    print(f" - M8 Fogo: {m8.Fogo}") 
     print(" -", repr(ambiente))
     print(" -", repr(oponente))
     
