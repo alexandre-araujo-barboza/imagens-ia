@@ -1,8 +1,11 @@
-# simula_swot_loop.py
 # Python 3.12
+# simula_swot.py
+# Dependencia de graph_swot.py
+
 from __future__ import annotations
 from typing import Dict, Any, Optional
 from graph_swot import iniciar_grafico_swot, iniciar_interface
+
 import threading
 import random
 import time
