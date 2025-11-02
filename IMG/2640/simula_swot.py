@@ -105,7 +105,7 @@ class M3(Humanoide):
         print("[M3] Render: M3 paralisa o alvo.")
 
     def Proteger(self) -> None:
-        print("[M3] Proteger: M3 procura proteção.")
+        print("[M3] Proteger: M3 protege unidades.")
 
     def Prender(self) -> None:
         print("[M3] Prender: M3 imobiliza/alvo é detido.")
